@@ -18,15 +18,17 @@ Known source variations handled automatically:
 """
 
 import os
+import sys
 import logging
+import time
 from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import multiprocessing
 
 # ─────────────────────────────────────────────
 # CONFIGURATION
 # ─────────────────────────────────────────────
-BASE_FOLDER = r"E:\DataMesRevert"
+BASE_FOLDER = r"E:\mesv3"
 LOG_FILE    = os.path.join(os.path.dirname(os.path.abspath(__file__)), "update_column_order.log")
 
 # The exact target column order (24 columns)
@@ -51,182 +53,174 @@ COLUMN_RENAME_MAP = {
 }
 
 # ─────────────────────────────────────────────
-# LOGGING SETUP
+# WORKER FUNCTION (runs in child processes)
+# NOTE: No logging here – workers return results back to main process.
+#       This prevents FileHandler conflicts on Windows spawn.
 # ─────────────────────────────────────────────
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
-        logging.StreamHandler(),
-    ],
-)
-logger = logging.getLogger(__name__)
-
-
-# ─────────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────────
-
-def should_process(file_path: Path) -> bool:
-    """Return True only for .csv files whose name starts with 'VNA' (case-insensitive)."""
-    return file_path.stem.upper().startswith("VNA")
-
-
-def find_csv_files(base: str) -> list[Path]:
-    """Recursively find all VNA*.csv files inside base_folder."""
-    return sorted(f for f in Path(base).rglob("*.csv") if should_process(f))
-
 
 def _normalise_header(raw_name: str) -> str:
-    """
-    Return the canonical column name for a raw header field.
-    Applies rename rules first, otherwise returns the stripped original.
-    """
     stripped = raw_name.strip()
-    key = stripped.lower()
-    return COLUMN_RENAME_MAP.get(key, stripped)
+    return COLUMN_RENAME_MAP.get(stripped.lower(), stripped)
 
 
-def process_file(file_path: Path) -> bool:
+def process_file(file_path_str: str) -> tuple[bool, str | None]:
     """
-    Read a CSV, normalise column names, reorder/add/drop columns to match
-    TARGET_COLUMNS, then overwrite the file.
-    Returns True if the file was modified.
+    Read a CSV, normalise columns, overwrite the file.
+    Returns (changed: bool, error_or_warning: str | None).
+    Worker processes MUST NOT call any module-level logger.
     """
+    file_path = Path(file_path_str)
     try:
         with open(file_path, "r", encoding="utf-8", errors="replace") as f:
             lines = f.readlines()
 
         if not lines:
-            logger.info("    Empty file – skipped")
-            return False
+            return False, None
 
-        # ── Parse & normalise header ──
-        header_line = lines[0].rstrip("\n").rstrip("\r")
-        raw_fields = header_line.split(",")
+        header_line = lines[0].rstrip("\r\n")
+        raw_fields  = header_line.split(",")
         norm_fields = [_normalise_header(c) for c in raw_fields]
 
-        # Build a lookup: normalised name → column index in source
         col_index: dict[str, int] = {}
         for i, name in enumerate(norm_fields):
-            # first occurrence wins (safety against duplicates)
             if name not in col_index:
                 col_index[name] = i
 
-        # Quick check: is the file already perfect?
         if norm_fields == TARGET_COLUMNS:
-            return False  # nothing to do
+            return False, None
 
-        # Make sure we have at least the minimum required columns
-        # (we allow "Remark" to be missing – it will be filled with "")
         target_set = set(TARGET_COLUMNS)
-        available  = set(col_index.keys())
-        missing    = target_set - available
-        # "Remark" can be missing (old Jan-2025 format); anything else is an error
+        missing    = target_set - set(col_index)
         unexpected_missing = missing - {"Remark"}
         if unexpected_missing:
-            logger.warning(f"    Missing columns {unexpected_missing} – skipped")
-            return False
+            return False, f"SKIP missing cols {unexpected_missing}: {file_path.name}"
 
-        extra = available - target_set
-        if extra:
-            logger.info(f"    Dropping extra columns: {extra}")
-
-        # ── Rebuild every line ──
         new_lines: list[str] = [",".join(TARGET_COLUMNS) + "\n"]
 
         for line in lines[1:]:
-            stripped = line.rstrip("\n").rstrip("\r")
+            stripped = line.rstrip("\r\n")
             if not stripped:
                 new_lines.append("\n")
                 continue
 
             values = stripped.split(",")
-            # Pad short rows so index lookups don't crash
             while len(values) < len(raw_fields):
                 values.append("")
 
             new_values: list[str] = []
             for col_name in TARGET_COLUMNS:
                 idx = col_index.get(col_name)
-                if idx is not None and idx < len(values):
-                    new_values.append(values[idx])
-                else:
-                    # Column didn't exist in source (e.g. "Remark") → empty
-                    new_values.append("")
+                new_values.append(values[idx] if idx is not None and idx < len(values) else "")
 
             new_lines.append(",".join(new_values) + "\n")
 
         with open(file_path, "w", encoding="utf-8", newline="") as f:
             f.writelines(new_lines)
 
-        return True
+        return True, None
 
     except Exception as exc:
-        logger.error(f"    ✘ Error: {exc}")
-        return False
+        return False, f"ERROR {file_path.name}: {exc}"
 
 
 # ─────────────────────────────────────────────
-# MAIN
+# MAIN (logging lives ONLY here)
 # ─────────────────────────────────────────────
 
 def main():
-    # Windows compatibility for multiprocessing
     multiprocessing.freeze_support()
 
+    # ── Setup logging in main process only ──
+    logger = logging.getLogger("main")
+    logger.setLevel(logging.INFO)
+    fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+
+    fh = logging.FileHandler(LOG_FILE, encoding="utf-8")
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(fmt)
+    logger.addHandler(fh)
+
+    # Console: show INFO so user can see progress in terminal
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(fmt)
+    logger.addHandler(ch)
+
     logger.info("=" * 60)
-    logger.info(f"Base folder    : {BASE_FOLDER}")
-    logger.info(f"Target columns : {len(TARGET_COLUMNS)} cols")
-    logger.info(f"  {TARGET_COLUMNS}")
-    logger.info(f"File filter    : VNA*.csv only")
+    logger.info(f"Base folder : {BASE_FOLDER}")
+    logger.info(f"Log file    : {LOG_FILE}")
     logger.info("=" * 60)
 
     if not os.path.isdir(BASE_FOLDER):
-        logger.error(f"Base folder does not exist: {BASE_FOLDER}")
+        logger.error(f"Folder not found: {BASE_FOLDER}")
+        print(f"ERROR: Folder not found: {BASE_FOLDER}", file=sys.stderr)
         return
 
-    csv_files = find_csv_files(BASE_FOLDER)
+    logger.info("Scanning files, please wait...")
+    csv_files = [
+        str(f) for f in Path(BASE_FOLDER).rglob("*.csv")
+        if f.stem.upper().startswith("VNA")
+    ]
     total = len(csv_files)
 
     if total == 0:
-        logger.warning("No matching CSV files found.")
+        logger.warning("No matching VNA*.csv files found.")
         return
 
-    logger.info(f"Found {total:,} CSV file(s). Starting Multiprocessing (All Cores)...\n")
+    # ThreadPoolExecutor is MUCH faster than ProcessPoolExecutor for I/O-bound tasks:
+    # - No spawn overhead (Windows multiprocessing creates new Python interpreters)
+    # - No serialization overhead for passing data between processes
+    # - Threads share memory, no 1.5M Future objects bloating RAM
+    num_workers = min(32, max(4, multiprocessing.cpu_count() * 2))
+    logger.info(f"Found {total:,} VNA*.csv file(s). Workers: {num_workers} (ThreadPool)")
 
     updated = 0
     skipped = 0
     errors  = 0
+    start_time = time.time()
+    LOG_INTERVAL = 10_000  # log every N files
+    BATCH_SIZE   = 50_000  # submit in batches to limit memory
 
-    # Determine number of workers (leave 1 core free for OS)
-    num_workers = max(1, multiprocessing.cpu_count() - 1)
-    
-    with ProcessPoolExecutor(max_workers=num_workers) as executor:
-        # Submit all tasks
-        future_to_file = {executor.submit(process_file, f): f for f in csv_files}
-        
-        for idx, future in enumerate(as_completed(future_to_file), start=1):
-            if idx % 10000 == 0 or idx == 1:
-                logger.info(f"Progress: {idx:,}/{total:,}  (current_updated~{updated:,})")
-            
-            try:
-                changed = future.result()
-                if changed:
+    for batch_start in range(0, total, BATCH_SIZE):
+        batch = csv_files[batch_start : batch_start + BATCH_SIZE]
+
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            future_to_path = {executor.submit(process_file, f): f for f in batch}
+
+            for future in as_completed(future_to_path):
+                changed, msg = future.result()
+                if msg:
+                    if msg.startswith("ERROR"):
+                        logger.error(msg)
+                        errors += 1
+                    else:
+                        logger.warning(msg)
+                        skipped += 1
+                elif changed:
                     updated += 1
                 else:
                     skipped += 1
-            except Exception as exc:
-                file_path = future_to_file[future]
-                logger.error(f"Error processing {file_path}: {exc}")
-                errors += 1
 
-    logger.info("")
+                idx = updated + skipped + errors
+                # Print progress every LOG_INTERVAL files
+                if idx % LOG_INTERVAL == 0 or idx == total:
+                    elapsed = time.time() - start_time
+                    rate = idx / elapsed if elapsed > 0 else 0
+                    pct = idx / total * 100
+                    remaining = (total - idx) / rate if rate > 0 else 0
+                    logger.info(
+                        f"Progress: {idx:,}/{total:,} ({pct:.1f}%)  "
+                        f"Updated={updated:,}  Skipped={skipped:,}  Errors={errors:,}  "
+                        f"[{elapsed:.0f}s elapsed, ~{remaining:.0f}s remaining, {rate:.0f} files/s]"
+                    )
+
+    elapsed_total = time.time() - start_time
     logger.info("=" * 60)
-    logger.info(f"Done!  Updated: {updated:,}  |  Skipped: {skipped:,}  |  Errors: {errors:,}")
+    logger.info(
+        f"Done!  Updated={updated:,}  Skipped={skipped:,}  Errors={errors:,}  "
+        f"Total time: {elapsed_total:.1f}s"
+    )
     logger.info(f"Log saved to: {LOG_FILE}")
-    logger.info("=" * 60)
 
 
 if __name__ == "__main__":
