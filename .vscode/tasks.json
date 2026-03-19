@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run UpdateDataColumn",
+			"type": "shell",
+			"command": "C:/Users/hieptd/AppData/Local/Programs/Python/Python313/python.exe",
+			"args": [
+				"update_column_order.py"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$python"
+			]
+		}
+	]
+}
