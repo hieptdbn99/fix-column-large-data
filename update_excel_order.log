@@ -1,0 +1,128 @@
+2026-03-24 11:46:38,830 [INFO] ============================================================
+2026-03-24 11:46:38,831 [INFO] Excel Column Order Update (Result before Remark)
+2026-03-24 11:46:38,831 [INFO] Base folder : E:\mesv3
+2026-03-24 11:46:38,831 [INFO] ============================================================
+2026-03-24 11:46:38,831 [INFO] Scanning for YYYY-MM-DD.xlsx files...
+2026-03-24 11:46:58,740 [INFO] Found 398 Excel file(s).
+2026-03-24 11:46:58,740 [INFO] Starting processing with 8 workers...
+2026-03-24 11:46:58,961 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-03.xlsx
+2026-03-24 11:46:59,259 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-04.xlsx
+2026-03-24 11:47:00,539 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-07.xlsx
+2026-03-24 11:47:02,968 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-05.xlsx
+2026-03-24 11:47:03,923 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-10.xlsx
+2026-03-24 11:47:04,490 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-09.xlsx
+2026-03-24 11:47:05,519 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-08.xlsx
+2026-03-24 11:47:05,530 [INFO] Progress: 10/398 | Updated=0 | Skipped=10 | Errors=0 | Time=6.8s
+2026-03-24 11:47:05,543 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-06.xlsx
+2026-03-24 11:47:06,586 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-12.xlsx
+2026-03-24 11:47:07,743 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-13.xlsx
+2026-03-24 11:47:07,929 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-11.xlsx
+2026-03-24 11:47:10,042 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-14.xlsx
+2026-03-24 11:47:12,201 [INFO] Progress: 20/398 | Updated=0 | Skipped=20 | Errors=0 | Time=13.5s
+2026-03-24 11:47:17,119 [INFO] Progress: 30/398 | Updated=0 | Skipped=30 | Errors=0 | Time=18.4s
+2026-03-24 11:47:21,945 [INFO] Progress: 40/398 | Updated=0 | Skipped=40 | Errors=0 | Time=23.2s
+2026-03-24 11:47:28,484 [INFO] Progress: 50/398 | Updated=0 | Skipped=50 | Errors=0 | Time=29.7s
+2026-03-24 11:47:35,350 [INFO] Progress: 60/398 | Updated=0 | Skipped=60 | Errors=0 | Time=36.6s
+2026-03-24 11:47:41,103 [INFO] Progress: 70/398 | Updated=0 | Skipped=70 | Errors=0 | Time=42.4s
+2026-03-24 11:47:46,665 [INFO] Progress: 80/398 | Updated=0 | Skipped=80 | Errors=0 | Time=47.9s
+2026-03-24 11:47:53,765 [INFO] Progress: 90/398 | Updated=0 | Skipped=90 | Errors=0 | Time=55.0s
+2026-03-24 11:48:03,125 [INFO] Progress: 100/398 | Updated=0 | Skipped=100 | Errors=0 | Time=64.4s
+2026-03-24 11:48:10,120 [INFO] Progress: 110/398 | Updated=0 | Skipped=110 | Errors=0 | Time=71.4s
+2026-03-24 11:48:15,300 [INFO] Progress: 120/398 | Updated=0 | Skipped=120 | Errors=0 | Time=76.6s
+2026-03-24 11:48:22,733 [INFO] Progress: 130/398 | Updated=0 | Skipped=130 | Errors=0 | Time=84.0s
+2026-03-24 11:48:29,858 [INFO] Progress: 140/398 | Updated=0 | Skipped=140 | Errors=0 | Time=91.1s
+2026-03-24 11:48:31,771 [ERROR] ERROR 2025-06-21.xlsx: File is not a zip file
+2026-03-24 11:48:38,807 [INFO] Progress: 150/398 | Updated=0 | Skipped=149 | Errors=1 | Time=100.1s
+2026-03-24 11:48:45,660 [INFO] Progress: 160/398 | Updated=0 | Skipped=159 | Errors=1 | Time=106.9s
+2026-03-24 11:48:49,899 [INFO] Progress: 170/398 | Updated=0 | Skipped=169 | Errors=1 | Time=111.2s
+2026-03-24 11:48:56,549 [INFO] Progress: 180/398 | Updated=0 | Skipped=179 | Errors=1 | Time=117.8s
+2026-03-24 11:49:04,810 [INFO] Progress: 190/398 | Updated=0 | Skipped=189 | Errors=1 | Time=126.1s
+2026-03-24 11:49:14,460 [INFO] Progress: 200/398 | Updated=0 | Skipped=199 | Errors=1 | Time=135.7s
+2026-03-24 11:49:23,151 [INFO] Progress: 210/398 | Updated=0 | Skipped=209 | Errors=1 | Time=144.4s
+2026-03-24 11:49:29,077 [INFO] Progress: 220/398 | Updated=0 | Skipped=219 | Errors=1 | Time=150.3s
+2026-03-24 11:49:35,588 [INFO] Progress: 230/398 | Updated=0 | Skipped=229 | Errors=1 | Time=156.8s
+2026-03-24 11:49:39,756 [INFO] Progress: 240/398 | Updated=0 | Skipped=239 | Errors=1 | Time=161.0s
+2026-03-24 11:49:43,913 [INFO] Progress: 250/398 | Updated=0 | Skipped=249 | Errors=1 | Time=165.2s
+2026-03-24 11:49:51,268 [INFO] Progress: 260/398 | Updated=0 | Skipped=259 | Errors=1 | Time=172.5s
+2026-03-24 11:50:01,101 [INFO] Progress: 270/398 | Updated=0 | Skipped=269 | Errors=1 | Time=182.4s
+2026-03-24 11:50:08,949 [INFO] Progress: 280/398 | Updated=0 | Skipped=279 | Errors=1 | Time=190.2s
+2026-03-24 11:50:19,269 [INFO] Progress: 290/398 | Updated=0 | Skipped=289 | Errors=1 | Time=200.5s
+2026-03-24 11:50:23,607 [ERROR] ERROR 2025-12-05.xlsx: File is not a zip file
+2026-03-24 11:50:25,217 [INFO] Progress: 300/398 | Updated=0 | Skipped=298 | Errors=2 | Time=206.5s
+2026-03-24 11:50:35,619 [INFO] Progress: 310/398 | Updated=0 | Skipped=308 | Errors=2 | Time=216.9s
+2026-03-24 11:50:44,041 [INFO] Progress: 320/398 | Updated=0 | Skipped=318 | Errors=2 | Time=225.3s
+2026-03-24 11:50:51,135 [INFO] Progress: 330/398 | Updated=0 | Skipped=328 | Errors=2 | Time=232.4s
+2026-03-24 11:50:59,349 [INFO] Progress: 340/398 | Updated=0 | Skipped=338 | Errors=2 | Time=240.6s
+2026-03-24 11:51:08,195 [INFO] Progress: 350/398 | Updated=0 | Skipped=348 | Errors=2 | Time=249.5s
+2026-03-24 11:51:20,708 [INFO] Progress: 360/398 | Updated=0 | Skipped=358 | Errors=2 | Time=262.0s
+2026-03-24 11:51:33,845 [INFO] Progress: 370/398 | Updated=0 | Skipped=368 | Errors=2 | Time=275.1s
+2026-03-24 11:51:43,060 [INFO] Progress: 380/398 | Updated=0 | Skipped=378 | Errors=2 | Time=284.3s
+2026-03-24 11:51:52,415 [INFO] Progress: 390/398 | Updated=0 | Skipped=388 | Errors=2 | Time=293.7s
+2026-03-24 11:52:00,224 [INFO] Progress: 398/398 | Updated=0 | Skipped=396 | Errors=2 | Time=301.5s
+2026-03-24 11:52:00,224 [INFO] ============================================================
+2026-03-24 11:52:00,225 [INFO] Finished. Total Updated: 0, Skipped: 396, Errors: 2
+2026-03-24 11:52:00,225 [INFO] Total time: 301.5s
+2026-03-24 11:54:16,859 [INFO] ============================================================
+2026-03-24 11:54:16,859 [INFO] Excel Column Order Update (Result before Remark)
+2026-03-24 11:54:16,859 [INFO] Base folder : E:\mesv3
+2026-03-24 11:54:16,860 [INFO] ============================================================
+2026-03-24 11:54:16,860 [INFO] Scanning for YYYY-MM-DD.xlsx files...
+2026-03-24 11:54:18,240 [INFO] Found 398 Excel file(s).
+2026-03-24 11:54:18,240 [INFO] Starting processing with 8 workers...
+2026-03-24 11:54:18,626 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-03.xlsx
+2026-03-24 11:54:18,740 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-04.xlsx
+2026-03-24 11:54:19,915 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-07.xlsx
+2026-03-24 11:54:23,432 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-05.xlsx
+2026-03-24 11:54:24,521 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-10.xlsx
+2026-03-24 11:54:24,721 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-09.xlsx
+2026-03-24 11:54:25,505 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-06.xlsx
+2026-03-24 11:54:25,891 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-08.xlsx
+2026-03-24 11:54:28,169 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-11.xlsx
+2026-03-24 11:54:28,314 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-12.xlsx
+2026-03-24 11:54:28,321 [INFO] Progress: 10/398 | Updated=0 | Skipped=10 | Errors=0 | Time=10.1s
+2026-03-24 11:54:29,114 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-13.xlsx
+2026-03-24 11:54:30,896 [WARNING] SKIP: 'Result' or 'Remark' not found in 2025-01-14.xlsx
+2026-03-24 11:54:45,451 [INFO] Progress: 20/398 | Updated=8 | Skipped=12 | Errors=0 | Time=27.2s
+2026-03-24 11:54:58,745 [INFO] Progress: 30/398 | Updated=18 | Skipped=12 | Errors=0 | Time=40.5s
+2026-03-24 11:55:11,491 [INFO] Progress: 40/398 | Updated=28 | Skipped=12 | Errors=0 | Time=53.3s
+2026-03-24 11:55:26,546 [INFO] Progress: 50/398 | Updated=38 | Skipped=12 | Errors=0 | Time=68.3s
+2026-03-24 11:55:44,012 [INFO] Progress: 60/398 | Updated=48 | Skipped=12 | Errors=0 | Time=85.8s
+2026-03-24 11:55:58,019 [INFO] Progress: 70/398 | Updated=58 | Skipped=12 | Errors=0 | Time=99.8s
+2026-03-24 11:56:10,071 [INFO] Progress: 80/398 | Updated=68 | Skipped=12 | Errors=0 | Time=111.8s
+2026-03-24 11:56:35,708 [INFO] Progress: 90/398 | Updated=78 | Skipped=12 | Errors=0 | Time=137.5s
+2026-03-24 11:56:50,374 [INFO] Progress: 100/398 | Updated=88 | Skipped=12 | Errors=0 | Time=152.1s
+2026-03-24 11:57:04,370 [INFO] Progress: 110/398 | Updated=98 | Skipped=12 | Errors=0 | Time=166.1s
+2026-03-24 11:57:17,064 [INFO] Progress: 120/398 | Updated=108 | Skipped=12 | Errors=0 | Time=178.8s
+2026-03-24 11:57:34,065 [INFO] Progress: 130/398 | Updated=118 | Skipped=12 | Errors=0 | Time=195.8s
+2026-03-24 11:57:49,375 [INFO] Progress: 140/398 | Updated=128 | Skipped=12 | Errors=0 | Time=211.1s
+2026-03-24 11:57:54,841 [ERROR] ERROR 2025-06-21.xlsx: File is not a zip file
+2026-03-24 11:58:16,375 [INFO] Progress: 150/398 | Updated=137 | Skipped=12 | Errors=1 | Time=238.1s
+2026-03-24 11:58:26,346 [INFO] Progress: 160/398 | Updated=147 | Skipped=12 | Errors=1 | Time=248.1s
+2026-03-24 11:58:38,675 [INFO] Progress: 170/398 | Updated=157 | Skipped=12 | Errors=1 | Time=260.4s
+2026-03-24 11:58:50,518 [INFO] Progress: 180/398 | Updated=167 | Skipped=12 | Errors=1 | Time=272.3s
+2026-03-24 11:59:10,266 [INFO] Progress: 190/398 | Updated=177 | Skipped=12 | Errors=1 | Time=292.0s
+2026-03-24 11:59:34,963 [INFO] Progress: 200/398 | Updated=187 | Skipped=12 | Errors=1 | Time=316.7s
+2026-03-24 11:59:53,955 [INFO] Progress: 210/398 | Updated=197 | Skipped=12 | Errors=1 | Time=335.7s
+2026-03-24 12:00:09,649 [INFO] Progress: 220/398 | Updated=207 | Skipped=12 | Errors=1 | Time=351.4s
+2026-03-24 12:00:20,132 [INFO] Progress: 230/398 | Updated=217 | Skipped=12 | Errors=1 | Time=361.9s
+2026-03-24 12:00:31,426 [INFO] Progress: 240/398 | Updated=227 | Skipped=12 | Errors=1 | Time=373.2s
+2026-03-24 12:00:43,607 [INFO] Progress: 250/398 | Updated=237 | Skipped=12 | Errors=1 | Time=385.4s
+2026-03-24 12:00:59,128 [INFO] Progress: 260/398 | Updated=247 | Skipped=12 | Errors=1 | Time=400.9s
+2026-03-24 12:01:28,977 [INFO] Progress: 270/398 | Updated=257 | Skipped=12 | Errors=1 | Time=430.7s
+2026-03-24 12:01:44,945 [INFO] Progress: 280/398 | Updated=267 | Skipped=12 | Errors=1 | Time=446.7s
+2026-03-24 12:02:12,044 [INFO] Progress: 290/398 | Updated=277 | Skipped=12 | Errors=1 | Time=473.8s
+2026-03-24 12:02:17,023 [ERROR] ERROR 2025-12-05.xlsx: File is not a zip file
+2026-03-24 12:02:22,705 [INFO] Progress: 300/398 | Updated=286 | Skipped=12 | Errors=2 | Time=484.5s
+2026-03-24 12:02:51,096 [INFO] Progress: 310/398 | Updated=296 | Skipped=12 | Errors=2 | Time=512.9s
+2026-03-24 12:03:15,067 [INFO] Progress: 320/398 | Updated=306 | Skipped=12 | Errors=2 | Time=536.8s
+2026-03-24 12:03:25,755 [INFO] Progress: 330/398 | Updated=316 | Skipped=12 | Errors=2 | Time=547.5s
+2026-03-24 12:03:46,160 [INFO] Progress: 340/398 | Updated=326 | Skipped=12 | Errors=2 | Time=567.9s
+2026-03-24 12:04:13,237 [INFO] Progress: 350/398 | Updated=336 | Skipped=12 | Errors=2 | Time=595.0s
+2026-03-24 12:04:35,825 [INFO] Progress: 360/398 | Updated=346 | Skipped=12 | Errors=2 | Time=617.6s
+2026-03-24 12:05:11,027 [INFO] Progress: 370/398 | Updated=356 | Skipped=12 | Errors=2 | Time=652.8s
+2026-03-24 12:05:36,578 [INFO] Progress: 380/398 | Updated=366 | Skipped=12 | Errors=2 | Time=678.3s
+2026-03-24 12:05:55,353 [INFO] Progress: 390/398 | Updated=376 | Skipped=12 | Errors=2 | Time=697.1s
+2026-03-24 12:06:10,694 [INFO] Progress: 398/398 | Updated=384 | Skipped=12 | Errors=2 | Time=712.5s
+2026-03-24 12:06:10,694 [INFO] ============================================================
+2026-03-24 12:06:10,694 [INFO] Finished. Total Updated: 384, Skipped: 12, Errors: 2
+2026-03-24 12:06:10,694 [INFO] Total time: 712.5s
