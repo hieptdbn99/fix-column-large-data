@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command": "C:/Users/hieptd/AppData/Local/Programs/Python/Python313/python.exe",
 			"args": [
-				"update_column_order.py"
+				"run_update.py"
 			],
 			"group": "build",
 			"isBackground": false,

@@ -2,14 +2,16 @@
 update_by_range.py
 ===================
 Updates CSV and XLSX files within a specific date range.
+Full 24-column reorder for XLSX (U,L,D,R order).
 Usage: python update_by_range.py <start_date> <end_date>
-Example: python update_by_range.py 21-03-2026 23-03-2026
+Example: python update_by_range.py 01-06-2025 19-03-2026
 """
 
 import os
 import sys
 import logging
 import time
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -18,7 +20,7 @@ import openpyxl
 # ─────────────────────────────────────────────
 # CONFIGURATION
 # ─────────────────────────────────────────────
-BASE_FOLDER = r"E:\mesv3"
+BASE_FOLDER = r"E:\mesv4"
 LOG_FILE    = os.path.join(os.path.dirname(os.path.abspath(__file__)), "range_update.log")
 
 CSV_TARGET_COLUMNS = [
@@ -33,8 +35,32 @@ CSV_RENAME_MAP = {
     "results": "Result",
 }
 
+XLSX_TARGET_HEADERS = [
+    "BUC Cover\r\nQR코드", "Backet\r\nbar code", "압착 거리값", "압력 시간",
+    "Temp 1", "Temp 2", "Temp 3", "Temp 4",
+    "U1", "U2", "U3",
+    "L1", "L2", "L3",
+    "D1", "D2", "D3",
+    "R1", "R2", "R3",
+    "Result", "Remark",
+    "생산일자", "생산시간",
+]
+
+
+def _normalise_xlsx_header(raw_value) -> str:
+    if raw_value is None:
+        return ""
+    s = str(raw_value).strip()
+    s = s.replace("_x000D_\n", "\r\n")
+    return s
+
+
+def _header_key(h: str) -> str:
+    return h.replace("\r\n", "").replace("\r", "").replace("\n", "").replace(" ", "").lower()
+
+
 # ─────────────────────────────────────────────
-# CORE LOGIC (Integrated)
+# CSV LOGIC
 # ─────────────────────────────────────────────
 
 def _normalise_csv_header(raw_name: str) -> str:
@@ -66,36 +92,83 @@ def process_csv_file(file_path_path: Path) -> tuple[bool, str | None]:
         with open(file_path_path, "w", encoding="utf-8", newline="") as f:
             f.writelines(new_lines)
         return True, None
-    except Exception as exc: return False, f"ERROR CSV {file_path_path.name}: {exc}"
+    except Exception as exc:
+        return False, f"ERROR CSV {file_path_path.name}: {exc}"
+
+
+# ─────────────────────────────────────────────
+# XLSX LOGIC (full 24-column reorder)
+# ─────────────────────────────────────────────
 
 def process_xlsx_file(file_path_path: Path) -> tuple[bool, str | None]:
     try:
         wb = openpyxl.load_workbook(file_path_path)
         sheet = wb.active
-        headers = [cell.value for cell in sheet[1]]
-        idx_result, idx_remark = -1, -1
-        for i, h in enumerate(headers):
-            if h is None: continue
-            h_str = str(h).strip().lower()
-            if h_str == "result": idx_result = i
-            elif h_str == "remark": idx_remark = i
-        if idx_result == -1 or idx_remark == -1:
-            return False, f"SKIP XLSX: 'Result' or 'Remark' not found in {file_path_path.name}"
-        if idx_result == idx_remark - 1: return False, None
-        all_data = []
+
+        if sheet.max_row is None or sheet.max_row == 0:
+            wb.close()
+            return False, None
+
+        raw_headers = [cell.value for cell in sheet[1]]
+        norm_headers = [_normalise_xlsx_header(h) for h in raw_headers]
+
+        col_index: dict[str, int] = {}
+        for i, h in enumerate(norm_headers):
+            key = _header_key(h)
+            if key and key not in col_index:
+                col_index[key] = i
+
+        current_keys = [_header_key(h) for h in norm_headers]
+        target_keys = [_header_key(h) for h in XLSX_TARGET_HEADERS]
+
+        if current_keys == target_keys:
+            wb.close()
+            return False, None
+
+        missing_keys = set(target_keys) - set(col_index.keys())
+        remark_key = _header_key("Remark")
+        unexpected_missing = missing_keys - {remark_key}
+        if unexpected_missing:
+            missing_names = []
+            for mk in unexpected_missing:
+                for th in XLSX_TARGET_HEADERS:
+                    if _header_key(th) == mk:
+                        missing_names.append(th)
+                        break
+            wb.close()
+            return False, f"SKIP XLSX missing cols {missing_names}: {file_path_path.name}"
+
+        all_rows = []
         for row in sheet.iter_rows(min_row=1, values_only=True):
-            r_list = list(row)
-            v_res = r_list.pop(idx_result)
-            new_idx = idx_remark if idx_result > idx_remark else idx_remark - 1
-            r_list.insert(new_idx, v_res)
-            all_data.append(r_list)
+            all_rows.append(list(row))
+
+        new_rows = []
+        for row_idx, row_data in enumerate(all_rows):
+            while len(row_data) < len(raw_headers):
+                row_data.append(None)
+            new_row = []
+            for target_h in XLSX_TARGET_HEADERS:
+                tkey = _header_key(target_h)
+                idx = col_index.get(tkey)
+                if idx is not None and idx < len(row_data):
+                    # Always use original data (including original header names)
+                    new_row.append(row_data[idx])
+                else:
+                    # Missing column (e.g. Remark) - add target header name or empty
+                    new_row.append(target_h if row_idx == 0 else "")
+            new_rows.append(new_row)
+
         sheet.delete_rows(1, sheet.max_row)
-        for r_idx, r_data in enumerate(all_data, 1):
-            for c_idx, val in enumerate(r_data, 1):
-                sheet.cell(row=r_idx, column=c_idx, value=val)
+        for r_idx, row_data in enumerate(new_rows, 1):
+            for c_idx, value in enumerate(row_data, 1):
+                sheet.cell(row=r_idx, column=c_idx, value=value)
+
         wb.save(file_path_path)
         return True, None
-    except Exception as exc: return False, f"ERROR XLSX {file_path_path.name}: {exc}"
+
+    except Exception as exc:
+        return False, f"ERROR XLSX {file_path_path.name}: {exc}"
+
 
 # ─────────────────────────────────────────────
 # MAIN
@@ -104,7 +177,7 @@ def process_xlsx_file(file_path_path: Path) -> tuple[bool, str | None]:
 def main():
     if len(sys.argv) < 3:
         print("Usage: python update_by_range.py DD-MM-YYYY DD-MM-YYYY")
-        print("Example: python update_by_range.py 21-03-2026 23-03-2026")
+        print("Example: python update_by_range.py 01-06-2025 19-03-2026")
         return
 
     try:
@@ -136,7 +209,6 @@ def main():
     current_date = start_date
     while current_date <= end_date:
         date_str = current_date.strftime("%Y-%m-%d")
-        # Structure: E:\mesv3\YYYY\MM\DD
         path_parts = [
             BASE_FOLDER,
             current_date.strftime("%Y"),
@@ -144,18 +216,18 @@ def main():
             current_date.strftime("%d")
         ]
         folder_path = os.path.join(*path_parts)
-        
+
         if os.path.isdir(folder_path):
             for f in os.listdir(folder_path):
                 f_path = os.path.join(folder_path, f)
                 if not os.path.isfile(f_path): continue
-                
+
                 f_upper = f.upper()
                 if f_upper.startswith("VNA") and f_upper.endswith(".CSV"):
                     files_to_process.append(f_path)
-                elif f == f"{date_str}.xlsx":
+                elif re.match(r"^\d{4}-\d{2}-\d{2}(_\d+)?\.xlsx$", f):
                     files_to_process.append(f_path)
-        
+
         current_date += timedelta(days=1)
 
     if not files_to_process:
@@ -163,7 +235,7 @@ def main():
         return
 
     logger.info(f"Found {len(files_to_process)} files to process.")
-    
+
     updated, skipped, errors = 0, 0, 0
     start_time = time.time()
 
@@ -175,7 +247,7 @@ def main():
                 futures[executor.submit(process_csv_file, p)] = f
             elif p.suffix.lower() == ".xlsx":
                 futures[executor.submit(process_xlsx_file, p)] = f
-        
+
         for i, future in enumerate(as_completed(futures), 1):
             changed, msg = future.result()
             if msg:
@@ -187,7 +259,7 @@ def main():
                     skipped += 1
             elif changed: updated += 1
             else: skipped += 1
-            
+
             if i % 10 == 0 or i == len(files_to_process):
                 logger.info(f"Progress: {i}/{len(files_to_process)} | Updated={updated} | Skipped={skipped} | Errors={errors}")
 
